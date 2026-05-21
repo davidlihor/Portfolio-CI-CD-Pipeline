@@ -1,0 +1,61 @@
+name: Deploy Portfolio Website to AWS
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'index.html'
+      - 'Resume.pdf'
+      - '*.png'
+      - '*.jpg'
+      - '*.jpeg'
+      - '*.webp'
+      - 'images/**'
+  workflow_dispatch:
+
+env:
+  AWS_REGION: "eu-central-1"
+  PROJECT_NAME: "portfolio-davidlihor"
+  ENVIRONMENT: "production"
+  DOMAIN_NAME: "davidlihor.com"
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Configure AWS Credentials with OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+          role-duration-seconds: 3600
+
+      - name: Upload files to S3
+        run: |
+          aws s3 sync . s3://${{ env.PROJECT_NAME }}-${{ env.ENVIRONMENT }} \
+            --exclude ".git/*" \
+            --exclude ".github/*" \
+            --exclude "terraform/*" \
+            --exclude "screenshots/*" \
+            --exclude ".gitignore" \
+            --exclude "README.md" \
+            --delete
+
+      - name: Invalidate CloudFront cache
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
+            --paths "/*" \
+            --query 'Invalidation.Id' \
+            --output text
+
+      - name: Display message
+        run: echo "Website update process initiated! Available shortly at https://${{ env.DOMAIN_NAME }}"
