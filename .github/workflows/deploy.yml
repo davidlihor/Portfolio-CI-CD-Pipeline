@@ -15,7 +15,7 @@ on:
   workflow_dispatch:
 
 env:
-  AWS_REGION: "us-east-1"
+  TARGET_AWS_REGION: "us-east-1"
   PROJECT_NAME: "portfolio-davidlihor"
   ENVIRONMENT: "production"
   DOMAIN_NAME: "davidlihor.com"
@@ -35,7 +35,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-          aws-region: ${{ env.AWS_REGION }}
+          aws-region: us-east-1
           role-duration-seconds: 3600
 
       - name: Upload files to S3
