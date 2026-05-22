@@ -9,11 +9,11 @@ terraform {
 }
 
 provider "aws" {
-  region = "eu-central-1"
+  region = var.region
   default_tags {
     tags = {
-      Project     = "portfolio"
-      Environment = "production"
+      Project     = var.project_name
+      Environment = var.environment
       ManagedBy   = "Terraform"
     }
   }
@@ -24,8 +24,8 @@ provider "aws" {
   region = "us-east-1"
   default_tags {
     tags = {
-      Project     = "portfolio"
-      Environment = "production"
+      Project     = var.project_name
+      Environment = var.environment
       ManagedBy   = "Terraform"
     }
   }
@@ -33,9 +33,9 @@ provider "aws" {
 
 module "portfolio_website" {
   source       = "../modules/static_website"
-  domain_name  = "davidlihor.com"
-  project_name = "portfolio-davidlihor"
-  environment  = "production"
+  domain_name  = var.domain_name
+  project_name = var.project_name
+  environment  = var.environment
 
   providers = {
     aws           = aws
