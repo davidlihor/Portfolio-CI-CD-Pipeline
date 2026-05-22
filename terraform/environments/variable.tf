@@ -5,18 +5,13 @@ variable "github_owner" {
 
 variable "github_repo" {
   type    = string
-  default = "portfolio-ci-cd-pipeline"
-}
-
-variable "github_branch" {
-  type    = string
-  default = "main"
+  default = "Portfolio-CI-CD-Pipeline"
 }
 
 locals {
   github_sub_claims = distinct([
-    "repo:${var.github_owner}/${var.github_repo}:ref:refs/heads/${var.github_branch}",
-    "repo:${lower(var.github_owner)}/${lower(var.github_repo)}:ref:refs/heads/${var.github_branch}"
+    "repo:${var.github_owner}/${var.github_repo}:*",
+    "repo:${lower(var.github_owner)}/${lower(var.github_repo)}:*"
   ])
 }
 
